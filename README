@@ -1,0 +1,62 @@
+ZipcodeMatch
+============
+
+A ZipcodeMatch egy, a magyarországi irányítószámok és települések egyezőségét ellenőrző plugin. Valójában ennél többre is képes, mivel adatbázisa tartalmazza minden magyarországi település és a hozzá tartozó irányítószámot(kat) így kiválóan felhasználható űrlapok adatbevitelének az ellenőrzésére vagy segítésére.
+
+A kiegészítő egy szakdolgozat[szakdolgozat.csiszarattila.com] eredményeképpen jött létre.
+
+Telepítés
+=========
+
+Plugin letöltése
+
+Adatok importálása
+Az egyszerűbb használat érdekében a kiterjesztés az adatokat adatbázisban tárolja, az adatbázist pedig egy Zipcode nevű ActiveRecord típusú modellen keresztül éri el. A modell használatához így egy migrációval előbb létre kell hozni a szükséges zipcodes nevű táblát.
+
+
+Az adatok importálásához futtasd
+
+
+Példák
+======
+Az ellenőrzésre a ZipcodeMatch.match?(település,irányítószám) használhatjuk, amely eldönti, hogy a megadott település és irányítószám összetartozik-e (figyelembe veszi, hogy egyes városok több irányítószámmal is rendelkezhetnek).
+
+Érdemes alacsony szintű ellenőrzésként alkalmazni egy modellben:
+
+def validate
+	unless ZipcodeMatch::match?(self.city, self.zipcode)
+		errors.add_to_base ...
+	end
+end
+
+API avagy a ZipcodeMatch modul metódusai
+==
+ZipcodeMatch osztálymetódus
+Mire használható?
+match?(település,irányítószám) 
+Annak eldöntése, hogy a település és irányítószám egyezik-e
+city_exist?(település) 
+Annak eldöntésére, hogy a megadott település létezik-e
+zipcode_exist?(irányítószám)
+Mint az előző csak irányítószám esetében
+city_with_zipcode(irányítószám)
+Visszaadja az adott irányítószámhoz tartozó települést
+zipcodes_for_city(település)
+Megkeresi az adott településhez tartozó irányítószámo(ka)t
+
+A db és zipcode névtéren belül a load (db:zipcodes:load) betölti, a delete (db:zipcodes:delete) pedig kitörli az adatokat az adatbázis táblából.
+
+
+Milyen adatokkal dolgozik?
+======
+A Magyar Posta weboldaláról[http://www.posta.hu/object.a4c06249-c686-4d95-b333-08b467959979.ivy] letölhető az összes Magyarországi irányítószám és a hozzá tartozó cím XLS formátumban. Az adatok adatbázisban való tárolásához ezt előbb CSV formátumba konvertáltam, majd az adatbázisba töltéskor csak az irányítószám és a hozzá tartozó település került mentésre (az adatforrás több, számunkra szükségtelen adatot is tartalmaz). 
+
+Ez egyben azt is jelenti, hogy egyes településekhez több irányítószám is tartozhat. A budapesti irányítószámok esetében pedig minden irányítószám mellett Budapest szerepel mint város, a kerületeket pedig nem veszi figyelembe.
+
+Ha ezen változtatni szeretnél a ZipcodeMatch.import_from_csv metódust tekintsd meg, ez végzi el az irányítószámok adatbázisba töltését - a db:zipcodes:load ezt hívja meg.
+
+Hogyan teszteljünk
+===========
+mock objektum
+
+Copyright (c) 2008 Csiszár Attila, released under the MIT license
