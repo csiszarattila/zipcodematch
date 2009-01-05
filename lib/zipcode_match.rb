@@ -40,7 +40,7 @@ module ActiveRecord
 					attr_value = record.send(configuration[:attr_is])
 					unless ZipcodeMatch.send("#{city_or_zipcode}_exist?", attr_value)
 						message = configuration[:message] || "Nem létezik"
-						record.errors.add attr_is, message
+						record.errors.add configuration[:attr_is], message
 					end
 				end
 			end
