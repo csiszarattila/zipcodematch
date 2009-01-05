@@ -19,7 +19,7 @@ module ActiveRecord
 					zipcode = record.send(configuration[:zipcode_attr_is])
 					city = record.send(configuration[:city_attr_is])
 					unless ZipcodeMatch::match?(city, zipcode)
-						message = configuration[:message] || "Hibás"
+						message = configuration[:message] || "Az irányítószám és a település nem egyezik."
 						record.errors.add_to_base(message)
 					end
 				end
@@ -30,8 +30,10 @@ module ActiveRecord
 				
 				if city_or_zipcode == :city
 					configuration[:attr_is] ||= :city
+					configuration[:message] ||= "Ilyen település nem létezik."
 				elsif city_or_zipcode == :zipcode
-					configuration[:attr_is] || :zipcode
+					configuration[:attr_is] ||= :zipcode
+					configuration[:message] ||= "Nem létező irányítószám."
 				else
 					raise ArgumentError, 'Firt argument must be either :city or :zipcode'
 				end
@@ -39,8 +41,7 @@ module ActiveRecord
 				send(validation_method(configuration[:on])) do |record|
 					attr_value = record.send(configuration[:attr_is])
 					unless ZipcodeMatch.send("#{city_or_zipcode}_exist?", attr_value)
-						message = configuration[:message] || "Nem létezik"
-						record.errors.add configuration[:attr_is], message
+						record.errors.add configuration[:attr_is], configuration[:message]
 					end
 				end
 			end
