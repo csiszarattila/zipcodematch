@@ -12,21 +12,21 @@ Plugin telepítése
 -----------------
 Egyszerűen parancssorból kiadva az alkalmazás könyvtárában:
 
-  script/plugin install git://github.com/csiszarattila/zipcodematch.git
+    script/plugin install git://github.com/csiszarattila/zipcodematch.git
 
 Adatok importálása
 ------------------
 Az egyszerűbb használat érdekében a kiterjesztés az adatokat adatbázisban tárolja, az adatbázist pedig egy Zipcode nevű ActiveRecord típusú modellen keresztül éri el. A modell használatához így egy migrációval előbb létre kell hozni a szükséges zipcodes elnevezésű táblát, ezt a plugin generátorával könnyen megteheted:
 
-  script/generate zipcodes table
+    script/generate zipcodes table
 
 Majd töltsük fel a létrehozott sémát:
 
-  rake db:migrate
+    rake db:migrate
   
 Majd az adatok beimportálásához az adatbázis táblába futtasd:
   
-  rake db:zipcodes:load
+    rake db:zipcodes:load
 
 (Légy türelemmel, ez a művelet eltarthat egy ideig.)
 
@@ -36,19 +36,19 @@ Az ellenőrzésre a __ZipcodeMatch.match?(település,irányítószám)__ haszn�
 
 Érdemes alacsony szintű ellenőrzésként alkalmazni egy modellben:
 
-  def validate
-  	unless ZipcodeMatch::match?(self.city, self.zipcode)
-  		errors.add_to_base ...
-  	end
-  end
+      def validate
+      	unless ZipcodeMatch::match?(self.city, self.zipcode)
+      		errors.add_to_base ...
+      	end
+      end
 
 vagy használd a magasabb szintű validációk egyikét:
 
-  class Address < ActiveRecord::Base
-    ...
-    validates_zipcode_and_city_match
-    ...
-  end
+      class Address < ActiveRecord::Base
+        ...
+        validates_zipcode_and_city_match
+        ...
+      end
 
 API
 ===
@@ -90,37 +90,37 @@ ActiveRecordos magasabb szintű validációk
 -----------------------------------------
 Az ellenőrzések egyszerűsítéshez az ActiveRecord modellek esetében a plugin definiál néhány magasabb szintű ellenőrzést is.
 
-A validates_zipcode_and_city_match két mező viszonylatában ellenőrzi a település és hozzá tartozó irányítószám egyezését:
+A __validates\_zipcode\_and\_city\_match__ két mező viszonylatában ellenőrzi a település és hozzá tartozó irányítószám egyezését:
   
-  class Address < ActiveRecord::Base
-    ...
-    validates_zipcode_and_city_match
-    ...
-  end
+      class Address < ActiveRecord::Base
+        ...
+        validates_zipcode_and_city_match
+        ...
+      end
   
 A hibaüzeneteket mindig a modellhez és nem az attribútumokhoz társítja! Alapértelmezettként a :city és :zipcode attributumokat használja fel. Ez megváltoztatható az opciókkal, többek között itt adhatjuk azt is meg, hogy mikor alkalmazza az ellenőrzést - alapértelmezettként a mentés során futtatja a validációt.
 
-  validates_zipcode_and_city_match :zipcode_attr_is=>:ir, :city_attr_is=>:varos, :on => :create
+    validates_zipcode_and_city_match :zipcode_attr_is=>:ir, :city_attr_is=>:varos, :on => :create
 
-A validates_existence_on segítségével vagy a modellhez tartozó települést vagy az irányítószámot vizsgálhatjuk meg, hogy érvényes-e. Használatához jellezzük a metódusnak első attribútumként, hogy melyiket szeretnénk vizsgálni:
+A __validates\_existence\_on__ segítségével vagy a modellhez tartozó települést vagy az irányítószámot vizsgálhatjuk meg, hogy érvényes-e. Használatához jellezzük a metódusnak első attribútumként, hogy melyiket szeretnénk vizsgálni:
 
 Települések esetében a :city szimbólummal
   
-  validates_existence_on :city, :message => "Ilyen nevű település nem létezik!"
+    validates_existence_on :city, :message => "Ilyen nevű település nem létezik!"
   
 Irányítószámok esetében a :zipcode szimbólummal
 
-  validates_existence_on :zipcode, :message => "Ilyen irányítószám nem létezik!"
+    validates_existence_on :zipcode, :message => "Ilyen irányítószám nem létezik!"
   
-Az alapértelmezett attribútum ezúttal is a city vagy a zipcode elnevezésű lesz, ezt felülbírálni az  :attr_is_ opcióval lehetséges:
+Az alapértelmezett attribútum ezúttal is a city vagy a zipcode elnevezésű lesz, ezt felülbírálni az  :attr\_is opcióval lehetséges:
 
-  validates_existence_on :city, :attr\_is => :varos
+    validates_existence_on :city, :attr_is => :varos
 
 Milyen adatokkal dolgozik?
 ==========================
 [A Magyar Posta weboldaláról](http://www.posta.hu/object.a4c06249-c686-4d95-b333-08b467959979.ivy) letölhető az összes Magyarországi irányítószám és a hozzá tartozó cím XLS formátumban. Az adatok adatbázisban való tárolásához ezt előbb CSV formátumba konvertáltam, majd az adatbázisba töltéskor csak az irányítószám és a hozzá tartozó település került mentésre (az adatforrás több, számunkra szükségtelen adatot is tartalmaz). 
 
-Ez egyben azt is jelenti, hogy egyes településekhez több irányítószám is tartozhat. A budapesti irányítószámok esetében pedig minden irányítószám mellett Budapest szerepel mint város, a kerületeket pedig nem veszi figyelembe. Ha ezen változtatni szeretnél a ZipcodeMatch.import_from_csv metódust tekintsd meg, ez végzi el az irányítószámok adatbázisba töltését - a db:zipcodes:load rake taszk pedig ezt hívja meg.
+Ez egyben azt is jelenti, hogy egyes településekhez több irányítószám is tartozhat. A budapesti irányítószámok esetében pedig minden irányítószám mellett Budapest szerepel mint város, a kerületeket pedig nem veszi figyelembe. Ha ezen változtatni szeretnél a ZipcodeMatch.import\_from\_csv metódust tekintsd meg, ez végzi el az irányítószámok adatbázisba töltését - a db:zipcodes:load rake taszk pedig ezt hívja meg.
 
 Hogyan futtassuk a modellek unit tesztjeit
 ==========================================
@@ -134,15 +134,20 @@ Ezért inkább érdemes létrehozni egy, a ZipcodeMatch modult imitáló úgynev
 
 Egy ilyen mock objektumot megtalálsz a plugin mellett, mindössze includold be annak modellnek a unit test fájljában, amelyik használja a plugin metódusait:
 
-  require 'zipcodematch/lib/mocks/zipcode_match.rb'
+    require 'zipcodematch/lib/mocks/zipcode_match.rb'
 
-  class AddressTest < ActiveSupport::TestCase
-  ...
-  end
+    class AddressTest < ActiveSupport::TestCase
+    ...
+    end
   
 Ezzel a teszteket függetleníthetjük a ZipcodeMatch modultól, amelynek működése külön tesztekkel van biztosítva - lásd plugin/ok/konyvtara/zipcodematch/test/ könyvtárt.
 
-Copyright (c) 2008 Csiszár Attila, released under the MIT license
+Ötletek, kérés, sóhaj, óhaj...
+===============================
 
 email: csiszar pont ati kukac gmail pont com
+
 www: [csiszarattila.com](http://csiszarattila.com)
+
+
+Copyright (c) 2008 Csiszár Attila, released under the MIT license
