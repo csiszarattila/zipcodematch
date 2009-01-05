@@ -59,13 +59,13 @@ module ZipcodeMatch
 		# hash_key for filename.csv
 		# hash_value == value of city field in db
 		city_names = {
-			:telepulesek => nil,
 			:budapest => "Budapest",
 			:gyor => "Győr",
 			:debrecen => "Debrecen",
 			:szeged => "Szeged",
 			:miskolc => "Miskolc",
-			:pecs => "Pécs"}
+			:pecs => "Pécs",
+			:telepulesek => nil}
 		
 		datadir = File.join(File.dirname(__FILE__), 'data')
 
